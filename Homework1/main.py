@@ -22,7 +22,7 @@ def iterate_nested_dict(current_dict, key_desired):
             return iterate_nested_dict(value, key_desired)
 
 # open source
-the_guardian_api_key = "598ada10-8e4e-488f-b814-629a31c55f63"
+the_guardian_api_key = "API-KEY"
 
 
 # 1 - Database of curated mutations - DoCM API - contains a list of aprox. 163 genes
