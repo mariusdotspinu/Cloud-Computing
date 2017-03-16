@@ -128,6 +128,18 @@ def update(m_dict, m_id):
 
     return "Ok"
 
+
+def send_proper_response(self, code):
+    """
+    Customised function for sending proper response
+    :param self: current object
+    :param code: Status code to be sent (int)
+    """
+    self.send_response(code)
+    self.send_header('Content-type', 'application/json')
+    self.end_headers()
+
+
 # load leader-board into memory
 m_data = json.loads(init_data())
 
@@ -144,31 +156,24 @@ class TennisPlayersRequestHandler(BaseHTTPRequestHandler):
 
             if str(searched_id).isdigit():
 
+                if self.path.split('/')[-2] != "players":
+                    send_proper_response(self, 400)
+                    return
+
                 if searched_id in m_data:
-                    self.send_response(200)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
+                    send_proper_response(self, 200)
                     self.wfile.write(bytes(json.dumps(m_data[searched_id]), "utf-8"))
                 else:
-                    self.send_response(400)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
+                    send_proper_response(self, 400)
                     self.wfile.write(bytes("Player not found!", "utf-8"))
 
             elif searched_id == "players":
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 200)
                 self.wfile.write(bytes(json.dumps(m_data), "utf-8"))
             else:
-                print(searched_id)
-                self.send_response(404)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 404)
         else:
-            self.send_response(404)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
+            send_proper_response(self, 404)
         return
 
     # POST
@@ -180,31 +185,21 @@ class TennisPlayersRequestHandler(BaseHTTPRequestHandler):
             try:
                 body = json.loads(body)
             except json.JSONDecodeError:
-                self.send_response(422)  # un-processable
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 422)
                 return
 
             verification = verify_data(body)
 
             if verification == "Ok":
                 insert_to_dict(body)
-                self.send_response(201)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 201)
             elif verification == "Duplicate":
-                self.send_response(409)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 409)
             else:
-                self.send_response(400)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 400)
 
         else:
-            self.send_response(404)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
+            send_proper_response(self, 404)
 
         return
 
@@ -216,6 +211,10 @@ class TennisPlayersRequestHandler(BaseHTTPRequestHandler):
 
             if str(searched_id).isdigit():
 
+                if self.path.split('/')[-2] != "players":
+                    send_proper_response(self, 400)
+                    return
+
                 if searched_id in m_data:
 
                     length = int(self.headers.get("content-length", 0))
@@ -224,35 +223,23 @@ class TennisPlayersRequestHandler(BaseHTTPRequestHandler):
                     try:
                         body = json.loads(body)
                     except json.JSONDecodeError:
-                        self.send_response(422)  # un-processable
-                        self.send_header('Content-type', 'application/json')
-                        self.end_headers()
+                        send_proper_response(self, 422)
                         return
 
                     update_message = update(body, searched_id)
 
                     if update_message == "Ok":
-                        self.send_response(200)
-                        self.send_header('Content-type', 'application/json')
-                        self.end_headers()
+                        send_proper_response(self, 200)
                     else:
-                        self.send_response(422)
-                        self.send_header('Content-type', 'application/json')
-                        self.end_headers()
+                        send_proper_response(self, 422)
 
                 else:
-                    self.send_response(400)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
+                    send_proper_response(self, 400)
 
             else:
-                self.send_response(404)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 404)
         else:
-            self.send_response(404)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
+            send_proper_response(self, 404)
         return
 
     # DELETE
@@ -263,24 +250,20 @@ class TennisPlayersRequestHandler(BaseHTTPRequestHandler):
 
             if str(searched_id).isdigit():
 
+                if self.path.split('/')[-2] != "players":
+                    send_proper_response(self, 400)
+                    return
+
                 if searched_id in m_data:
                     del(m_data[searched_id])
-                    self.send_response(204)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
+                    send_proper_response(self, 204)
                 else:
-                    self.send_response(400)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
+                    send_proper_response(self, 400)
 
             else:
-                self.send_response(404)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
+                send_proper_response(self, 404)
         else:
-            self.send_response(404)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
+            send_proper_response(self, 404)
         return
 
 
